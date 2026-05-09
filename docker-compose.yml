@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: staybite-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: staybite
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - staybite-network
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: staybite-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - staybite-network
+
+  discovery-server:
+    build:
+      context: ./discovery-server
+    container_name: staybite-discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - staybite-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: staybite-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+    networks:
+      - staybite-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: staybite-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/staybite?createDatabaseIfNotExist=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_REDIS_HOST=redis-cache
+      - SPRING_REDIS_PORT=6379
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+    depends_on:
+      - mysql-db
+      - redis-cache
+      - discovery-server
+    networks:
+      - staybite-network
+
+volumes:
+  mysql_data:
+
+networks:
+  staybite-network:
+    driver: bridge
