@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "event_bookings")
@@ -20,12 +20,22 @@ public class EventBooking {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String eventType; // "Wedding", "Birthday", "Ring Ceremony", "Corporate"
+    private String eventType; // "Wedding", "Birthday", "Ring Ceremony", "Corporate", etc.
     private Integer guests;
-    private LocalDate bookingDate;
+    
+    private String area; // "Entire Hotel", "Banquet Hall", "Pool Area", "Rooftop"
+    
+    private LocalDateTime bookingDate;
 
-    private Boolean needsCatering;
-    private Boolean needsDecoration;
+    private String cateringPackage; // "Veg", "Non-Veg", "Premium Buffet", "Live Counter"
+    private String decorationPackage; // "Basic", "Premium", "Royal Theme", "Floral"
+    
+    private String additionalServices; // Comma separated: "DJ,Photography,Videography,Security"
+
+    private Double estimatedCost;
+    private Double advancePaid;
 
     private String status; // "PENDING", "APPROVED", "REJECTED"
+    
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

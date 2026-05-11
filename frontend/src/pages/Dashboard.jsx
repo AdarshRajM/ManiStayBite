@@ -10,8 +10,8 @@ import { useState, useEffect } from 'react';
 
 const STATS = [
   { label: "Active Bookings", value: "2", icon: CalendarIcon, color: "text-blue-500", bg: "bg-blue-500/10" },
-  { label: "Food Orders", value: "12", icon: ShoppingBag, color: "text-green-500", bg: "bg-green-500/10" },
-  { label: "Total Spent", value: "₹15,400", icon: CreditCard, color: "text-purple-500", bg: "bg-purple-500/10" },
+  { label: "Wallet Balance", value: "₹5,400", icon: CreditCard, color: "text-green-500", bg: "bg-green-500/10" },
+  { label: "Loyalty Points", value: "1,200", icon: Sparkles, color: "text-purple-500", bg: "bg-purple-500/10" },
 ];
 
 export default function Dashboard() {

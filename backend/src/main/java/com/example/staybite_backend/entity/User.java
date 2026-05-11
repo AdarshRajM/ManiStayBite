@@ -25,4 +25,9 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "hotel_id")
     private Hotel hotel; // Nullable for CUSTOMER and SUPER_ADMIN
+
+    // Wallet and Loyalty
+    private Double walletBalance = 0.0;
+    private Integer loyaltyPoints = 0;
+    private Boolean isVip = false;
 }

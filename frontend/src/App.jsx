@@ -11,8 +11,8 @@ import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import HotelOwnerDashboard from './pages/HotelOwnerDashboard';
 import EmployeeDashboard from './pages/EmployeeDashboard';
 import Rooms from './pages/Rooms';
-import EventBooking from './pages/EventBooking';
-import ResortServices from './pages/ResortServices';
+import EventBookingPage from './pages/EventBookingPage';
+import ServicesHub from './pages/ServicesHub';
 import ForgotPassword from './pages/ForgotPassword';
 import AIPlanner from './pages/AIPlanner';
 import Community from './pages/Community';
@@ -53,8 +53,8 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/ai-planner" element={<AIPlanner />} />
               <Route path="/rooms" element={<Rooms />} />
-              <Route path="/events" element={<EventBooking />} />
-              <Route path="/services" element={<ResortServices />} />
+              <Route path="/events" element={<EventBookingPage />} />
+              <Route path="/services" element={<ServicesHub />} />
               <Route path="/community" element={<Community />} />
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/queue" element={<QueueTracker />} />
@@ -81,11 +81,11 @@ function App() {
               />
               <Route 
                 path="/events" 
-                element={isAuthenticated ? <EventBooking /> : <Navigate to="/login" replace />} 
+                element={isAuthenticated ? <EventBookingPage /> : <Navigate to="/login" replace />} 
               />
               <Route 
                 path="/services" 
-                element={isAuthenticated ? <ResortServices /> : <Navigate to="/login" replace />} 
+                element={isAuthenticated ? <ServicesHub /> : <Navigate to="/login" replace />} 
               />
             </Routes>
           </ErrorBoundary>
