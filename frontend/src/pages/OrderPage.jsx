@@ -19,6 +19,10 @@ const MENU_ITEMS = [
   { id: 10, name: "Garlic Naan", price: 60, image: "https://images.unsplash.com/photo-1603894584373-5ac82b6ae398?auto=format&fit=crop&w=500&q=60", category: "Bread" },
   { id: 11, name: "Hot Jalebi", price: 120, image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=500&q=60", category: "Sweet" },
   { id: 12, name: "Cold Coffee", price: 150, image: "https://images.unsplash.com/photo-1461023058943-0708e5223eeb?auto=format&fit=crop&w=500&q=60", category: "Drink" },
+  { id: 13, name: "Tandoori Chicken Platter", price: 450, image: "/food/tandoori_chicken.png", category: "Starter" },
+  { id: 14, name: "Shahi Paneer", price: 280, image: "/food/shahi_paneer.png", category: "Main Course" },
+  { id: 15, name: "Hyderabadi Mutton Biryani", price: 400, image: "/food/mutton_biryani.png", category: "Main Course" },
+  { id: 16, name: "Crispy Masala Dosa", price: 180, image: "/food/masala_dosa.png", category: "Main Course" },
 ];
 
 export default function OrderPage() {
