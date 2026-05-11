@@ -23,7 +23,7 @@ export default function HotelOwnerDashboard() {
 
   // Modals state
   const [showFoodModal, setShowFoodModal] = useState(false);
-  const [newFood, setNewFood] = useState({ name: '', price: '', image: '' });
+  const [newFood, setNewFood] = useState({ name: '', price: '', image: '', category: 'Fast Food', description: '', offerTag: '', tags: '' });
   
   const [coupons, setCoupons] = useState([{ code: 'WELCOME50', discount: 50 }]);
   const [showCouponModal, setShowCouponModal] = useState(false);
@@ -87,21 +87,26 @@ export default function HotelOwnerDashboard() {
   const handleAddFood = async (e) => {
     e.preventDefault();
     if (newFood.name && newFood.price) {
+      const payload = {
+        foodName: newFood.name,
+        category: newFood.category,
+        description: newFood.description,
+        price: Number(newFood.price),
+        imageUrl: newFood.image,
+        offerTag: newFood.offerTag,
+        tags: newFood.tags,
+      };
       try {
-        const response = await api.post('/owner/food', {
-          foodName: newFood.name,
-          price: Number(newFood.price),
-          imageUrl: newFood.image,
-        });
+        const response = await api.post('/owner/food', payload);
         setFoods([...foods, response.data]);
         showToast('Menu item added successfully.');
       } catch (err) {
         console.error('Error adding food item', err);
-        setFoods([...foods, { foodName: newFood.name, price: Number(newFood.price), imageUrl: newFood.image }]);
+        setFoods([...foods, payload]);
         showToast('Menu item added locally. Backend unavailable.');
       }
       setShowFoodModal(false);
-      setNewFood({ name: '', price: '', image: '' });
+      setNewFood({ name: '', price: '', image: '', category: 'Fast Food', description: '', offerTag: '', tags: '' });
     }
   };
 
@@ -513,12 +518,32 @@ export default function HotelOwnerDashboard() {
                   <input type="text" required value={newFood.name} onChange={e=>setNewFood({...newFood, name: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. Rasgulla" />
                 </div>
                 <div>
+                  <label className="block text-sm font-bold mb-2">Category</label>
+                  <select required value={newFood.category} onChange={e=>setNewFood({...newFood, category: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500">
+                    {['Fast Food','Beverages','Veg Food','Non-Veg Food','Chinese','South Indian','Breakfast','Desserts','Healthy','Kids Menu','Combo Meals','Buffet Packages'].map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-bold mb-2">Price (₹)</label>
                   <input type="number" required value={newFood.price} onChange={e=>setNewFood({...newFood, price: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. 100" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold mb-2">Image URL</label>
                   <input type="url" value={newFood.image} onChange={e=>setNewFood({...newFood, image: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://unsplash.com/..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Tags</label>
+                  <input type="text" value={newFood.tags} onChange={e=>setNewFood({...newFood, tags: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. spicy, chef special" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Offer Tag</label>
+                  <input type="text" value={newFood.offerTag} onChange={e=>setNewFood({...newFood, offerTag: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. Bestseller, Combo Offer" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Description</label>
+                  <textarea value={newFood.description} onChange={e=>setNewFood({...newFood, description: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500 resize-none h-24" placeholder="A short menu description" />
                 </div>
                 <button type="submit" className="w-full py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-all shadow-lg hover:shadow-primary-500/25">Add Item</button>
               </form>

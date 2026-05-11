@@ -4,6 +4,7 @@ import com.example.staybite_backend.entity.Role;
 import com.example.staybite_backend.entity.User;
 import com.example.staybite_backend.repository.UserRepository;
 import com.example.staybite_backend.security.JwtUtil;
+import com.example.staybite_backend.exception.ResourceNotFoundException;
 import com.example.staybite_backend.service.FirebaseAuthService;
 import com.example.staybite_backend.service.OtpService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,28 +43,51 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody Map<String, String> request) {
-        if (userRepository.findByEmail(request.get("email")).isPresent()) {
-            return ResponseEntity.badRequest().body("Error: Email is already in use!");
+        String email = request.get("email");
+        String password = request.get("password");
+        String name = request.get("name");
+
+        if (email == null || email.isBlank()) {
+            return badRequestResponse("Email is required for signup.");
+        }
+        if (password == null || password.isBlank()) {
+            return badRequestResponse("Password is required for signup.");
+        }
+        if (name == null || name.isBlank()) {
+            return badRequestResponse("Name is required for signup.");
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            return badRequestResponse("Email is already in use.");
         }
 
         User user = new User();
-        user.setName(request.get("name"));
-        user.setEmail(request.get("email"));
-        user.setPassword(passwordEncoder.encode(request.get("password")));
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
         
-        // Default role is CUSTOMER, but allowing role passing for testing
-        String roleStr = request.getOrDefault("role", "CUSTOMER");
-        user.setRole(Role.valueOf(roleStr));
+        // Signup always creates a regular customer account.
+        user.setRole(Role.CUSTOMER);
         
         userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully!");
+        return ResponseEntity.ok(Map.of("message", "User registered successfully!"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String password = request.get("password");
+
+        if (email == null || email.isBlank()) {
+            return badRequestResponse("Email is required for login.");
+        }
+        if (password == null || password.isBlank()) {
+            return badRequestResponse("Password is required for login.");
+        }
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.get("email"), request.get("password")));
+                new UsernamePasswordAuthenticationToken(email, password));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String jwt = jwtUtil.generateToken(userDetails);
@@ -73,7 +97,8 @@ public class AuthController {
         response.put("email", userDetails.getUsername());
         
         // Return role as well
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userDetails.getUsername()));
         response.put("role", user.getRole().name());
 
         return ResponseEntity.ok(response);
@@ -84,6 +109,13 @@ public class AuthController {
         String firebaseToken = request.get("token");
         String name = request.getOrDefault("name", "User");
         String phoneOrEmail = request.get("identifier"); // Phone number or Email from Firebase
+
+        if (firebaseToken == null || firebaseToken.isBlank()) {
+            return badRequestResponse("Firebase token is required for firebase login.");
+        }
+        if (phoneOrEmail == null || phoneOrEmail.isBlank()) {
+            return badRequestResponse("Identifier is required for firebase login.");
+        }
 
         try {
             String uid = firebaseAuthService.verifyToken(firebaseToken);
@@ -121,14 +153,18 @@ public class AuthController {
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
         String identifier = request.get("identifier"); // Email or Phone for WhatsApp
-        // String channel = request.get("channel"); // EMAIL or WHATSAPP
+        if (identifier == null || identifier.isBlank()) {
+            return badRequestResponse("Identifier is required to send OTP.");
+        }
         
         String otp = otpService.generateOtp(identifier);
         
         // Mock sending OTP
         System.out.println("OTP for " + identifier + ": " + otp);
         
-        return ResponseEntity.ok("OTP sent successfully. Valid for 5 minutes.");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "OTP sent successfully. Valid for 5 minutes.");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/verify-otp")
@@ -137,9 +173,18 @@ public class AuthController {
         String otp = request.get("otp");
         String name = request.getOrDefault("name", "User");
 
+        if (identifier == null || identifier.isBlank()) {
+            return badRequestResponse("Identifier is required to verify OTP.");
+        }
+        if (otp == null || otp.isBlank()) {
+            return badRequestResponse("OTP code is required.");
+        }
+
         boolean isValid = otpService.verifyOtp(identifier, otp);
         if (!isValid) {
-            return ResponseEntity.status(401).body("Invalid or expired OTP, or too many attempts.");
+            return ResponseEntity.status(401).body(Map.of(
+                    "error", "Unauthorized",
+                    "message", "Invalid or expired OTP, or too many attempts."));
         }
 
         // Login or Create user
@@ -167,5 +212,12 @@ public class AuthController {
         response.put("role", user.getRole().name());
 
         return ResponseEntity.ok(response);
+    }
+
+    private ResponseEntity<Map<String, String>> badRequestResponse(String message) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Bad Request");
+        error.put("message", message);
+        return ResponseEntity.badRequest().body(error);
     }
 }

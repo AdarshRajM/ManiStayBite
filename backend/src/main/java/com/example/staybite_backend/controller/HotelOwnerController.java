@@ -44,6 +44,9 @@ public class HotelOwnerController {
 
     @PostMapping("/food")
     public ResponseEntity<Food> addFood(@RequestBody Food food) {
+        if (food.getCategory() == null || food.getCategory().trim().isEmpty()) {
+            food.setCategory("Uncategorized");
+        }
         return ResponseEntity.ok(foodRepository.save(food));
     }
 
@@ -59,6 +62,15 @@ public class HotelOwnerController {
         food.setFoodName(foodDetails.getFoodName());
         food.setPrice(foodDetails.getPrice());
         food.setCategory(foodDetails.getCategory());
+        food.setDescription(foodDetails.getDescription());
+        food.setImageUrl(foodDetails.getImageUrl());
+        food.setVegetarian(foodDetails.getVegetarian());
+        food.setSpicy(foodDetails.getSpicy());
+        food.setRating(foodDetails.getRating());
+        food.setTags(foodDetails.getTags());
+        food.setOfferTag(foodDetails.getOfferTag());
+        food.setCombo(foodDetails.getCombo());
+        food.setSubscriptionPlan(foodDetails.getSubscriptionPlan());
         return ResponseEntity.ok(foodRepository.save(food));
     }
 
