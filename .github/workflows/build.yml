@@ -22,7 +22,7 @@ jobs:
         
     - name: Build with Maven
       working-directory: ./backend
-      run: ./mvnw clean package -DskipTests
+      run: ./mvnw clean package -Dmaven.test.skip=true
 
   build-frontend:
     name: Build React Frontend

@@ -22,13 +22,13 @@ public class AiControllerTest {
     public void testChatWithBot() {
         // Arrange
         Map<String, String> request = new HashMap<>();
-        request.put("message", "Recommend a room");
+        request.put("query", "Recommend a room");
 
         // Act
-        ResponseEntity<Map<String, String>> response = aiController.chatWithBot(request);
+        ResponseEntity<Map<String, String>> response = aiController.chatWithAi(request);
 
         assertEquals(200, response.getStatusCode().value());
-        assertTrue(response.getBody().containsKey("reply"));
-        assertTrue(response.getBody().get("reply").contains("Infinity Pool"));
+        assertTrue(response.getBody().containsKey("response"));
+        assertTrue(response.getBody().get("response").contains("This is an AI generated response"));
     }
 }
