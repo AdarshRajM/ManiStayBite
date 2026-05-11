@@ -1,40 +1,93 @@
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Plus, Search, Heart, X, Trash2 } from 'lucide-react';
-import { useState, useMemo, useEffect } from 'react';
-
+import { ShoppingCart, Plus, Search, Heart, X, Trash2, Star, Clock, Filter, Sparkles, ChefHat } from 'lucide-react';
 import QRCodeBill from '../components/QRCodeBill';
 import PaymentModal from '../components/PaymentModal';
 import api from '../utils/api';
 
 const MENU_ITEMS = [
-  { id: 1, name: "Gulab Jamun", price: 150, image: "https://images.unsplash.com/photo-1596450514735-a50d2402129c?auto=format&fit=crop&w=500&q=60", category: "Sweet" },
-  { id: 2, name: "Rasmalai", price: 200, image: "https://images.unsplash.com/photo-1550993414-cb9287a55cfa?auto=format&fit=crop&w=500&q=60", category: "Sweet" },
-  { id: 3, name: "Paneer Tikka", price: 300, image: "https://images.unsplash.com/photo-1567158442220-4a81ba082163?auto=format&fit=crop&w=500&q=60", category: "Starter" },
-  { id: 4, name: "Veg Biryani", price: 250, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=500&q=60", category: "Main Course" },
-  { id: 5, name: "Kaju Katli", price: 400, image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=500&q=60", category: "Sweet" },
-  { id: 6, name: "Crispy Samosa", price: 50, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=500&q=60", category: "Snack" },
-  { id: 7, name: "Mango Lassi", price: 90, image: "https://images.unsplash.com/photo-1574542459039-4d642b36e897?auto=format&fit=crop&w=500&q=60", category: "Drink" },
-  { id: 8, name: "Butter Chicken", price: 350, image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=60", category: "Main Course" },
-  { id: 9, name: "Dal Makhani", price: 220, image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=60", category: "Main Course" },
-  { id: 10, name: "Garlic Naan", price: 60, image: "https://images.unsplash.com/photo-1603894584373-5ac82b6ae398?auto=format&fit=crop&w=500&q=60", category: "Bread" },
-  { id: 11, name: "Hot Jalebi", price: 120, image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=500&q=60", category: "Sweet" },
-  { id: 12, name: "Cold Coffee", price: 150, image: "https://images.unsplash.com/photo-1461023058943-0708e5223eeb?auto=format&fit=crop&w=500&q=60", category: "Drink" },
-  { id: 13, name: "Tandoori Chicken Platter", price: 450, image: "/food/tandoori_chicken.png", category: "Starter" },
-  { id: 14, name: "Shahi Paneer", price: 280, image: "/food/shahi_paneer.png", category: "Main Course" },
-  { id: 15, name: "Hyderabadi Mutton Biryani", price: 400, image: "/food/mutton_biryani.png", category: "Main Course" },
-  { id: 16, name: "Crispy Masala Dosa", price: 180, image: "/food/masala_dosa.png", category: "Main Course" },
+  // 1. Fast Food 🍔
+  { id: 101, name: "Veg Burger", price: 120, category: "Fast Food", type: "Veg", rating: 4.2, image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=60" },
+  { id: 102, name: "Chicken Burger", price: 180, category: "Fast Food", type: "Non-Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60" },
+  { id: 103, name: "Cheese Burger", price: 150, category: "Fast Food", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?auto=format&fit=crop&w=500&q=60" },
+  { id: 104, name: "French Fries", price: 90, category: "Fast Food", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=500&q=60" },
+  { id: 105, name: "Pizza Margherita", price: 250, category: "Fast Food", type: "Veg", rating: 4.7, customizable: true, image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=500&q=60" },
+  { id: 106, name: "Pasta Alfredo", price: 200, category: "Fast Food", type: "Veg", rating: 4.3, image: "https://images.unsplash.com/photo-1621996311239-531f0e5d65bb?auto=format&fit=crop&w=500&q=60" },
+  { id: 107, name: "Grilled Sandwich", price: 110, category: "Fast Food", type: "Veg", rating: 4.1, image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=500&q=60" },
+  { id: 108, name: "Hot Dog", price: 140, category: "Fast Food", type: "Non-Veg", rating: 4.0, image: "https://images.unsplash.com/photo-1541214113241-212e8d2dc60a?auto=format&fit=crop&w=500&q=60" },
+  { id: 109, name: "Garlic Bread", price: 120, category: "Fast Food", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?auto=format&fit=crop&w=500&q=60" },
+
+  // 2. Beverages 🍹
+  { id: 201, name: "Coca Cola", price: 50, category: "Beverages", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&w=500&q=60" },
+  { id: 202, name: "Mango Juice", price: 80, category: "Beverages", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1600271886742-f049cd451b02?auto=format&fit=crop&w=500&q=60" },
+  { id: 203, name: "Chocolate Shake", price: 150, category: "Beverages", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=500&q=60" },
+  { id: 204, name: "Cold Coffee", price: 130, category: "Beverages", type: "Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1461023058943-0708e5223eeb?auto=format&fit=crop&w=500&q=60" },
+  { id: 205, name: "Cappuccino", price: 120, category: "Beverages", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1534260164206-2a3a4a72891d?auto=format&fit=crop&w=500&q=60" },
+
+  // 3. Veg Food 🥗
+  { id: 301, name: "Paneer Butter Masala", price: 280, category: "Veg Food", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=60" },
+  { id: 302, name: "Dal Makhani", price: 220, category: "Veg Food", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=60" },
+  { id: 303, name: "Veg Biryani", price: 250, category: "Veg Food", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=500&q=60" },
+  { id: 304, name: "Butter Naan", price: 50, category: "Veg Food", type: "Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1603894584373-5ac82b6ae398?auto=format&fit=crop&w=500&q=60" },
+  { id: 305, name: "Shahi Paneer", price: 290, category: "Veg Food", type: "Veg", rating: 4.8, image: "/food/shahi_paneer.png" },
+
+  // 4. Non-Veg Food 🍗
+  { id: 401, name: "Butter Chicken", price: 350, category: "Non-Veg Food", type: "Non-Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=60" },
+  { id: 402, name: "Chicken Biryani", price: 320, category: "Non-Veg Food", type: "Non-Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1589302168068-964664d93cb0?auto=format&fit=crop&w=500&q=60" },
+  { id: 403, name: "Tandoori Chicken", price: 400, category: "Non-Veg Food", type: "Non-Veg", rating: 4.7, image: "/food/tandoori_chicken.png" },
+  { id: 404, name: "Mutton Biryani", price: 450, category: "Non-Veg Food", type: "Non-Veg", rating: 4.9, image: "/food/mutton_biryani.png" },
+  { id: 405, name: "Fish Fry", price: 300, category: "Non-Veg Food", type: "Non-Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=500&q=60" },
+
+  // 5. Chinese 🍜
+  { id: 501, name: "Hakka Noodles", price: 180, category: "Chinese", type: "Veg", rating: 4.4, image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=500&q=60" },
+  { id: 502, name: "Chilli Chicken", price: 250, category: "Chinese", type: "Non-Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=500&q=60" },
+
+  // 6. South Indian 🥥
+  { id: 601, name: "Masala Dosa", price: 150, category: "South Indian", type: "Veg", rating: 4.8, image: "/food/masala_dosa.png" },
+  { id: 602, name: "Idli Sambhar", price: 120, category: "South Indian", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=500&q=60" },
+
+  // 7. Breakfast 🍳
+  { id: 701, name: "Pancakes", price: 160, category: "Breakfast", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1528207776546-38f36c533e4b?auto=format&fit=crop&w=500&q=60" },
+  { id: 702, name: "Bread Omelette", price: 90, category: "Breakfast", type: "Non-Veg", rating: 4.3, image: "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=500&q=60" },
+
+  // 8. Desserts 🍰
+  { id: 801, name: "Gulab Jamun", price: 100, category: "Desserts", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1596450514735-a50d2402129c?auto=format&fit=crop&w=500&q=60" },
+  { id: 802, name: "Chocolate Brownie", price: 180, category: "Desserts", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=500&q=60" },
+
+  // 9. Healthy / Diet Food 🥙
+  { id: 901, name: "Grilled Chicken Salad", price: 250, category: "Healthy", type: "Non-Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=60" },
+  { id: 902, name: "Protein Shake", price: 200, category: "Healthy", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=500&q=60" },
+
+  // 10. Kids Menu 👦
+  { id: 1001, name: "Mini Burger & Smile Fries", price: 200, category: "Kids Menu", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1632712995328-912b7f3549ce?auto=format&fit=crop&w=500&q=60" },
+  
+  // 11. Combo Meals 🍽️
+  { id: 1101, name: "Burger + Fries + Coke", price: 250, category: "Combo Meals", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1594212884260-0a37de5cc235?auto=format&fit=crop&w=500&q=60" },
+  { id: 1102, name: "Chicken Biryani + Coke", price: 350, category: "Combo Meals", type: "Non-Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1589302168068-964664d93cb0?auto=format&fit=crop&w=500&q=60" },
+
+  // 12. Buffet Packages
+  { id: 1201, name: "Grand Veg Buffet", price: 799, category: "Buffet Packages", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=60" },
+  { id: 1202, name: "Royal Non-Veg Buffet", price: 999, category: "Buffet Packages", type: "Non-Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=60" },
 ];
+
+const CATEGORIES = ["All", "Fast Food", "Beverages", "Veg Food", "Non-Veg Food", "Chinese", "South Indian", "Breakfast", "Desserts", "Healthy", "Kids Menu", "Combo Meals", "Buffet Packages"];
 
 export default function OrderPage() {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [tokenInfo, setTokenInfo] = useState(null);
-  const [useLoyaltyPoints, setUseLoyaltyPoints] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [splitCount, setSplitCount] = useState(1);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('All'); // All, Veg, Non-Veg, Premium, Spicy
+  
+  // Customization Modal State
+  const [customItem, setCustomItem] = useState(null);
+  const [customizations, setCustomizations] = useState({ extraCheese: false, spicy: false, noOnion: false });
+
+  // Live Kitchen Status
+  const [kitchenStatus, setKitchenStatus] = useState("Preparing"); // Preparing, Cooking, Packed, Delivered
 
   useEffect(() => {
     const savedWishlist = localStorage.getItem('staybite_wishlist');
@@ -42,11 +95,35 @@ export default function OrderPage() {
   }, []);
 
   const filteredMenu = useMemo(() => {
-    return MENU_ITEMS.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()) || item.category.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [searchQuery]);
+    return MENU_ITEMS.filter(item => {
+      const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchCat = activeCategory === 'All' || item.category === activeCategory;
+      const matchFilter = activeFilter === 'All' || 
+                          (activeFilter === 'Veg' && item.type === 'Veg') || 
+                          (activeFilter === 'Non-Veg' && item.type === 'Non-Veg') ||
+                          (activeFilter === 'Premium' && item.price >= 300);
+      return matchSearch && matchCat && matchFilter;
+    });
+  }, [searchQuery, activeCategory, activeFilter]);
 
-  const addToCart = (item) => {
-    setCart([...cart, item]);
+  const handleAddToCart = (item) => {
+    if (item.customizable) {
+      setCustomItem(item);
+    } else {
+      setCart([...cart, { ...item, finalPrice: item.price, addons: [] }]);
+    }
+  };
+
+  const confirmCustomAddToCart = () => {
+    let addonPrice = 0;
+    let addons = [];
+    if (customizations.extraCheese) { addonPrice += 40; addons.push("Extra Cheese"); }
+    if (customizations.spicy) { addons.push("Make it Spicy"); }
+    if (customizations.noOnion) { addons.push("No Onion/Garlic"); }
+    
+    setCart([...cart, { ...customItem, finalPrice: customItem.price + addonPrice, addons }]);
+    setCustomItem(null);
+    setCustomizations({ extraCheese: false, spicy: false, noOnion: false });
   };
 
   const removeFromCart = (index) => {
@@ -57,139 +134,229 @@ export default function OrderPage() {
 
   const toggleWishlist = (item) => {
     const exists = wishlist.find(w => w.id === item.id);
-    let newWishlist;
-    if (exists) {
-      newWishlist = wishlist.filter(w => w.id !== item.id);
-    } else {
-      newWishlist = [...wishlist, item];
-    }
+    let newWishlist = exists ? wishlist.filter(w => w.id !== item.id) : [...wishlist, item];
     setWishlist(newWishlist);
     localStorage.setItem('staybite_wishlist', JSON.stringify(newWishlist));
   };
 
-  const handleCheckout = () => {
-    setIsCartOpen(false);
-    setIsCheckingOut(true);
-    setShowPayment(true);
-  };
-
   const processPaymentSuccess = async () => {
     setShowPayment(false);
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
-    const finalTotal = useLoyaltyPoints ? total - 50 : total;
     try {
-      const mockToken = "STB" + Math.floor(1000 + Math.random() * 9000);
-      setTokenInfo({ tokenNumber: mockToken, amount: finalTotal, items: cart.length });
+      const payload = {
+        orderType: "ROOM_SERVICE",
+        totalAmount: cart.reduce((s, i) => s + i.finalPrice, 0),
+        itemsDetails: JSON.stringify(cart),
+        paymentStatus: "SUCCESS"
+      };
+      await api.post('/orders/create', payload);
+      
+      const mockToken = "FOOD" + Math.floor(1000 + Math.random() * 9000);
+      setTokenInfo({ tokenNumber: mockToken, amount: payload.totalAmount, items: cart.length });
       setCart([]);
+      
+      // Simulate kitchen progress
+      setKitchenStatus("Cooking");
+      setTimeout(() => setKitchenStatus("Packed"), 5000);
+      setTimeout(() => setKitchenStatus("Delivered"), 10000);
     } catch(err) {
-      console.error(err);
+      console.error("Order failed:", err);
     }
   };
 
   if (tokenInfo) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center py-12">
+      <div className="min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 gap-8">
         <QRCodeBill tokenNumber={tokenInfo.tokenNumber} amount={tokenInfo.amount} items={tokenInfo.items} />
+        
+        {/* Live Kitchen Tracker */}
+        <div className="glass dark:dark-glass p-8 rounded-3xl w-full max-w-2xl text-center">
+          <h2 className="text-2xl font-bold mb-8 flex items-center justify-center gap-2">
+            <ChefHat className="text-primary-500" /> Live Kitchen Tracker
+          </h2>
+          <div className="flex justify-between items-center relative px-8">
+            <div className="absolute top-1/2 left-8 right-8 h-1 bg-slate-200 dark:bg-slate-700 -z-10 -translate-y-1/2"></div>
+            
+            {["Preparing", "Cooking", "Packed", "Delivered"].map((status, idx) => {
+              const stages = ["Preparing", "Cooking", "Packed", "Delivered"];
+              const currentIndex = stages.indexOf(kitchenStatus);
+              const isPast = idx <= currentIndex;
+              const isActive = idx === currentIndex;
+              
+              return (
+                <div key={status} className="flex flex-col items-center gap-2">
+                  <motion.div 
+                    initial={{ scale: 0.8 }} animate={{ scale: isActive ? 1.2 : 1 }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-500 ${isPast ? 'bg-green-500 text-white' : 'bg-slate-300 dark:bg-slate-600 text-slate-500'}`}
+                  >
+                    {isPast ? "✓" : idx + 1}
+                  </motion.div>
+                  <span className={`text-sm font-bold ${isActive ? 'text-green-500' : 'text-slate-500'}`}>{status}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     );
   }
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
+  const cartTotal = cart.reduce((sum, item) => sum + item.finalPrice, 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex justify-between items-end mb-12">
+      {/* Header & AI Recommendations */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
         <div>
-          <h1 className="text-4xl font-bold mb-4">Our Premium Menu</h1>
-          <p className="text-slate-500">Discover our exquisite culinary offerings.</p>
-        </div>
-        <div className="glass dark:dark-glass px-6 py-3 rounded-full flex items-center gap-3 relative cursor-pointer" onClick={() => setIsCartOpen(true)}>
-          <ShoppingCart className="w-5 h-5" />
-          <span className="font-bold">{cart.length} Items</span>
-          {cart.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-primary-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-lg">
-              {cart.length}
-            </span>
-          )}
-        </div>
-      </div>
-      
-      {/* Search and Mood AI Filter */}
-      <div className="mb-12 space-y-6">
-        <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search foods, categories..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
-          />
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-orange-500">
+            The Ultimate Dining
+          </h1>
+          <p className="text-slate-500 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-yellow-500" /> AI suggests: <span className="font-bold text-white">Pizza + Cold Coffee Combo</span>
+          </p>
         </div>
         
-        <div className="text-center">
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">AI Mood Recommendation</h3>
-          <div className="flex flex-wrap justify-center gap-3">
-            {['All', 'Romantic', 'Party', 'Gym'].map(mood => (
-              <button 
-                key={mood}
-                onClick={() => setSearchQuery(mood === 'All' ? '' : mood)}
-                className="px-6 py-2 rounded-full border-2 border-primary-500 font-bold transition-all hover:bg-primary-500 hover:text-white dark:text-white"
-              >
-                {mood}
-              </button>
-            ))}
-          </div>
+        <div className="glass dark:dark-glass px-6 py-3 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-colors" onClick={() => setIsCartOpen(true)}>
+          <ShoppingCart className="w-5 h-5 text-primary-500" />
+          <span className="font-bold">{cart.length} Items (₹{cartTotal})</span>
         </div>
       </div>
 
-      {Object.entries(
-        filteredMenu.reduce((acc, item) => {
-          if (!acc[item.category]) acc[item.category] = [];
-          acc[item.category].push(item);
-          return acc;
-        }, {})
-      ).map(([category, items]) => (
-        <div key={category} className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 border-b border-slate-200 dark:border-slate-700 pb-2">{category}s</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-            {items.map((item, i) => (
-              <motion.div 
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: i * 0.1 }}
-                className="glass dark:dark-glass rounded-3xl overflow-hidden group flex flex-col"
-              >
-                <div className="h-48 overflow-hidden relative">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute top-4 right-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold">
-                    {item.category}
-                  </div>
-                  <button 
-                    onClick={() => toggleWishlist(item)}
-                    className="absolute top-4 left-4 p-2 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md hover:text-red-500 transition-colors"
-                  >
-                    <Heart className={`w-4 h-4 ${wishlist.find(w => w.id === item.id) ? 'fill-red-500 text-red-500' : ''}`} />
-                  </button>
-                </div>
-                <div className="p-6 flex-grow flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{item.name}</h3>
-                    <span className="text-xl font-bold text-primary-500">₹{item.price}</span>
-                  </div>
-                  <button 
-                    onClick={() => addToCart(item)}
-                    className="w-full mt-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-primary-500 hover:text-white transition-all flex items-center justify-center gap-2 font-bold shadow-sm"
-                  >
-                    <Plus className="w-5 h-5" /> Add to Cart
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+      {/* Search & Filters */}
+      <div className="flex flex-col lg:flex-row gap-4 mb-8">
+        <div className="relative flex-grow">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input 
+            type="text" 
+            placeholder="Search pizza, spicy food, breakfast..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+          />
         </div>
-      ))}
+        
+        <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+          {['All', 'Veg', 'Non-Veg', 'Premium'].map(filter => (
+            <button 
+              key={filter} onClick={() => setActiveFilter(filter)}
+              className={`px-6 py-4 rounded-2xl font-bold whitespace-nowrap transition-all flex items-center gap-2 ${activeFilter === filter ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30' : 'glass dark:dark-glass hover:bg-white/10'}`}
+            >
+              <Filter className="w-4 h-4" /> {filter}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Categories Bar */}
+      <div className="flex gap-3 overflow-x-auto pb-6 mb-8 custom-scrollbar">
+        {CATEGORIES.map(cat => (
+          <button 
+            key={cat} onClick={() => setActiveCategory(cat)}
+            className={`px-6 py-3 rounded-full font-bold whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-slate-800 text-white dark:bg-white dark:text-black' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-700'}`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Menu Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <AnimatePresence>
+          {filteredMenu.map((item, i) => (
+            <motion.div 
+              layout
+              key={item.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="glass dark:dark-glass rounded-[2rem] overflow-hidden group flex flex-col border border-white/10 hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/20 transition-all"
+            >
+              <div className="h-48 overflow-hidden relative p-2">
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.5rem] transition-transform duration-700 group-hover:scale-110" />
+                
+                {/* Badges */}
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                  <div className={`w-6 h-6 rounded bg-white flex items-center justify-center shadow-md p-1 border-2 ${item.type === 'Veg' ? 'border-green-500' : 'border-red-500'}`}>
+                    <div className={`w-3 h-3 rounded-full ${item.type === 'Veg' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  </div>
+                  {item.price >= 300 && <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md uppercase">Premium</span>}
+                </div>
+
+                <button 
+                  onClick={() => toggleWishlist(item)}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-colors"
+                >
+                  <Heart className={`w-5 h-5 ${wishlist.find(w => w.id === item.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+                </button>
+              </div>
+              
+              <div className="p-6 flex-grow flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-bold leading-tight">{item.name}</h3>
+                    <div className="flex items-center gap-1 text-sm font-bold bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-lg">
+                      <Star className="w-4 h-4 fill-yellow-500" /> {item.rating}
+                    </div>
+                  </div>
+                  <p className="text-sm text-slate-500 mb-4">{item.category}</p>
+                </div>
+                
+                <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
+                  <span className="text-2xl font-black text-primary-500">₹{item.price}</span>
+                  <button 
+                    onClick={() => handleAddToCart(item)}
+                    className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-primary-500 hover:text-white transition-all flex items-center justify-center font-bold shadow-sm group-hover:scale-110"
+                  >
+                    <Plus className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        
+        {filteredMenu.length === 0 && (
+          <div className="col-span-full py-20 text-center text-slate-500">
+            <Search className="w-16 h-16 mx-auto mb-4 opacity-30" />
+            <h3 className="text-2xl font-bold mb-2">No food items found</h3>
+            <p>Try adjusting your search or filters.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Customization Modal */}
+      <AnimatePresence>
+        {customItem && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="glass dark:dark-glass p-8 rounded-3xl w-full max-w-md border border-white/10">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold">Customize Order</h3>
+                <button onClick={() => setCustomItem(null)} className="p-2 hover:bg-white/10 rounded-full"><X /></button>
+              </div>
+              <p className="text-lg font-bold text-primary-500 mb-6">{customItem.name} - ₹{customItem.price}</p>
+              
+              <div className="space-y-4 mb-8">
+                <label className="flex items-center justify-between p-4 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/5">
+                  <span className="font-bold">Extra Cheese (+₹40)</span>
+                  <input type="checkbox" className="w-5 h-5 accent-primary-500" checked={customizations.extraCheese} onChange={() => setCustomizations({...customizations, extraCheese: !customizations.extraCheese})} />
+                </label>
+                <label className="flex items-center justify-between p-4 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/5">
+                  <span className="font-bold">Make it Spicy (Free)</span>
+                  <input type="checkbox" className="w-5 h-5 accent-primary-500" checked={customizations.spicy} onChange={() => setCustomizations({...customizations, spicy: !customizations.spicy})} />
+                </label>
+                <label className="flex items-center justify-between p-4 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/5">
+                  <span className="font-bold">No Onion / Garlic (Jain)</span>
+                  <input type="checkbox" className="w-5 h-5 accent-primary-500" checked={customizations.noOnion} onChange={() => setCustomizations({...customizations, noOnion: !customizations.noOnion})} />
+                </label>
+              </div>
+
+              <button onClick={confirmCustomAddToCart} className="w-full py-4 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-colors shadow-lg">
+                Confirm & Add to Cart
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Cart Drawer */}
       <AnimatePresence>
@@ -197,33 +364,39 @@ export default function OrderPage() {
           <>
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
               onClick={() => setIsCartOpen(false)}
             />
             <motion.div 
               initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-              className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-dark-bg z-50 shadow-2xl flex flex-col"
+              className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-slate-900 z-50 shadow-2xl flex flex-col border-l border-white/10"
             >
               <div className="p-6 flex justify-between items-center border-b border-slate-200 dark:border-slate-800">
                 <h2 className="text-2xl font-bold flex items-center gap-2"><ShoppingCart /> Your Cart</h2>
                 <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"><X /></button>
               </div>
               
-              <div className="flex-grow overflow-y-auto p-6 space-y-4">
+              <div className="flex-grow overflow-y-auto p-6 space-y-4 custom-scrollbar">
                 {cart.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-slate-500">
-                    <ShoppingCart className="w-16 h-16 mb-4 opacity-50" />
-                    <p>Your cart is empty.</p>
+                    <ShoppingCart className="w-24 h-24 mb-6 opacity-20" />
+                    <p className="text-xl font-bold">Your cart is empty.</p>
+                    <p className="text-sm mt-2">Looks like you haven't added anything yet.</p>
                   </div>
                 ) : (
                   cart.map((item, index) => (
-                    <div key={index} className="flex gap-4 items-center p-3 glass dark:dark-glass rounded-xl">
-                      <img src={item.image} alt={item.name} className="w-16 h-16 rounded-lg object-cover" />
-                      <div className="flex-grow">
-                        <h4 className="font-bold">{item.name}</h4>
-                        <p className="text-primary-500 font-bold">₹{item.price}</p>
+                    <div key={index} className="flex gap-4 p-4 glass dark:dark-glass rounded-2xl border border-white/5">
+                      <img src={item.image} alt={item.name} className="w-20 h-20 rounded-xl object-cover" />
+                      <div className="flex-grow flex flex-col justify-between">
+                        <div>
+                          <h4 className="font-bold leading-tight">{item.name}</h4>
+                          {item.addons?.length > 0 && (
+                            <p className="text-xs text-slate-400 mt-1">{item.addons.join(", ")}</p>
+                          )}
+                        </div>
+                        <p className="text-primary-500 font-bold text-lg">₹{item.finalPrice}</p>
                       </div>
-                      <button onClick={() => removeFromCart(index)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-full">
+                      <button onClick={() => removeFromCart(index)} className="p-2 h-10 w-10 flex items-center justify-center text-red-500 hover:bg-red-500/20 rounded-xl transition-colors">
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
@@ -232,34 +405,13 @@ export default function OrderPage() {
               </div>
 
               {cart.length > 0 && (
-                <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                  <div className="mb-4 p-4 bg-primary-500/10 border border-primary-500/20 rounded-xl flex justify-between items-center">
-                    <div>
-                      <h3 className="font-bold text-primary-600 dark:text-primary-400">Loyalty Points</h3>
-                      <p className="text-xs text-slate-500">Available: 500 (₹50)</p>
-                    </div>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" className="w-5 h-5 rounded text-primary-500 focus:ring-primary-500" checked={useLoyaltyPoints} onChange={() => setUseLoyaltyPoints(!useLoyaltyPoints)} />
-                      <span className="font-bold text-sm">Apply</span>
-                    </label>
+                <div className="p-8 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+                  <div className="flex justify-between items-center mb-6 text-2xl">
+                    <span className="font-bold text-slate-400">Total</span>
+                    <span className="font-black text-primary-500">₹{cartTotal}</span>
                   </div>
-                  <div className="flex justify-between items-center mb-4 text-xl">
-                    <span className="font-bold">Total:</span>
-                    <span className="font-bold text-primary-500">₹{useLoyaltyPoints ? cartTotal - 50 : cartTotal}</span>
-                  </div>
-
-                  <div className="mb-6 p-4 bg-white/50 dark:bg-slate-800/50 rounded-xl">
-                    <label className="text-sm font-bold block mb-2">Split Bill (Group Checkout)</label>
-                    <div className="flex gap-4 items-center">
-                      <input type="number" min="1" max="10" value={splitCount} onChange={(e) => setSplitCount(parseInt(e.target.value) || 1)} className="w-20 p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-center outline-none" />
-                      <span className="text-sm font-bold text-slate-500">
-                        ₹{splitCount > 0 ? ((useLoyaltyPoints ? cartTotal - 50 : cartTotal) / splitCount).toFixed(2) : 0} / person
-                      </span>
-                    </div>
-                  </div>
-
-                  <button onClick={handleCheckout} className="w-full py-4 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-all shadow-lg hover:shadow-primary-500/25">
-                    Proceed to Checkout
+                  <button onClick={() => { setIsCartOpen(false); setShowPayment(true); }} className="w-full py-5 bg-gradient-to-r from-primary-500 to-orange-500 text-white rounded-2xl font-bold text-lg hover:shadow-lg hover:shadow-primary-500/30 transition-all hover:scale-[1.02]">
+                    Checkout Now
                   </button>
                 </div>
               )}
@@ -270,8 +422,8 @@ export default function OrderPage() {
 
       {showPayment && (
         <PaymentModal 
-          amount={useLoyaltyPoints ? cartTotal - 50 : cartTotal} 
-          onClose={() => {setShowPayment(false); setIsCheckingOut(false);}} 
+          amount={cartTotal} 
+          onClose={() => setShowPayment(false)} 
           onSuccess={processPaymentSuccess} 
         />
       )}

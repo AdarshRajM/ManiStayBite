@@ -21,8 +21,15 @@ public class Order {
 
     private String tokenNumber;
     private String paymentStatus; // "SUCCESS", "PENDING"
-    private String orderStatus; // "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED"
+    private String orderStatus; // "PREPARING", "COOKING", "PACKED", "DELIVERED"
     
+    @Column(columnDefinition = "TEXT")
+    private String itemsDetails; // JSON representing cart items, addons, combos
+    
+    private Double totalAmount;
+    private String orderType; // "ROOM_SERVICE", "BUFFET", "TABLE_RESERVATION"
+    private String specialInstructions; // "Extra cheese, no onion"
+
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private User employee;
