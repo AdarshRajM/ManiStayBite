@@ -1,11 +1,16 @@
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BACKEND_BASE_URL = API_BASE_URL.endsWith('/api') ? API_BASE_URL.slice(0, -4) : API_BASE_URL;
+
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // Spring Boot Backend URL
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+export const backendBaseUrl = BACKEND_BASE_URL;
 
 // Interceptor to attach JWT token to every request
 api.interceptors.request.use(

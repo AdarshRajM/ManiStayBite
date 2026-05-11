@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Package, CheckCircle, Clock } from 'lucide-react';
-import api from '../utils/api';
+import api, { backendBaseUrl } from '../utils/api';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 
@@ -34,7 +34,8 @@ export default function EmployeeDashboard() {
       
       // Broadcast WebSocket
       try {
-        const socket = new SockJS('http://localhost:8080/ws');
+        const wsEndpoint = backendBaseUrl ? `${backendBaseUrl}/ws` : '/ws';
+        const socket = new SockJS(wsEndpoint);
         const stompClient = Stomp.over(socket);
         stompClient.connect({}, () => {
           stompClient.send('/app/order.status', {}, JSON.stringify({ orderId: id, status: newStatus }));

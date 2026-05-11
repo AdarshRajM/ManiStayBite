@@ -76,7 +76,8 @@ export default function Signup({ setIsAuthenticated, setUserRole }) {
       setStep(2);
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
     } catch (err) {
-      showToast("❌ Failed to send OTP: " + (err.response?.data || err.message));
+      const errorMessage = err.response?.data || err.message || 'Network error';
+      showToast(`❌ Failed to send OTP: ${errorMessage}. Ensure backend is reachable or set VITE_API_BASE_URL.`);
     }
   };
 

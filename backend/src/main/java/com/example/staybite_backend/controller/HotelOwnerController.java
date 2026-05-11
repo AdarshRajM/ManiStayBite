@@ -9,9 +9,11 @@ import com.example.staybite_backend.repository.RoomRepository;
 import com.example.staybite_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/owner")
@@ -25,6 +27,9 @@ public class HotelOwnerController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/dashboard")
     public ResponseEntity<String> getOwnerDashboard() {
@@ -91,6 +96,21 @@ public class HotelOwnerController {
     @PostMapping("/employees")
     public ResponseEntity<User> addEmployee(@RequestBody User employee) {
         employee.setRole(Role.EMPLOYEE);
+        if (employee.getPassword() == null || employee.getPassword().trim().isEmpty()) {
+            employee.setPassword(passwordEncoder.encode("welcome123"));
+        } else {
+            employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        }
+        return ResponseEntity.ok(userRepository.save(employee));
+    }
+
+    @PutMapping("/employees/{id}/permissions")
+    public ResponseEntity<User> updateEmployeePermissions(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        User employee = userRepository.findById(id).orElseThrow();
+        String permissions = payload.getOrDefault("permissions", employee.getPermissions());
+        String assignedTasks = payload.getOrDefault("assignedTasks", employee.getAssignedTasks());
+        employee.setPermissions(permissions);
+        employee.setAssignedTasks(assignedTasks);
         return ResponseEntity.ok(userRepository.save(employee));
     }
 
