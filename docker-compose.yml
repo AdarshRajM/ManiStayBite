@@ -25,6 +25,7 @@ services:
   discovery-server:
     build:
       context: ./discovery-server
+      dockerfile: Dockerfile
     container_name: staybite-discovery
     ports:
       - "8761:8761"
@@ -42,9 +43,19 @@ services:
     networks:
       - staybite-network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: staybite-frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - staybite-network
+
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: staybite-backend
     ports:
