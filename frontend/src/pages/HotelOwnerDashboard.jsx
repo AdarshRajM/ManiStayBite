@@ -9,10 +9,21 @@ export default function HotelOwnerDashboard() {
   const [orders, setOrders] = useState([]);
   const [foods, setFoods] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [toastMessage, setToastMessage] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [employeeTasks, setEmployeeTasks] = useState({
+    menuManager: false,
+    pricingManager: false,
+    orderManager: false,
+    housekeeping: false,
+    receptionist: false,
+  });
+  const [editingFoodId, setEditingFoodId] = useState(null);
+  const [showEmployeeSettings, setShowEmployeeSettings] = useState(false);
 
   // Modals state
   const [showFoodModal, setShowFoodModal] = useState(false);
-  const [newFood, setNewFood] = useState({ name: '', price: '', image: '' });
+  const [newFood, setNewFood] = useState({ name: '', price: '', image: '', category: 'Fast Food', description: '', offerTag: '', tags: '' });
   
   const [coupons, setCoupons] = useState([{ code: 'WELCOME50', discount: 50 }]);
   const [showCouponModal, setShowCouponModal] = useState(false);
@@ -29,25 +40,36 @@ export default function HotelOwnerDashboard() {
     fetchData();
   }, []);
 
+  const showToast = (msg, duration = 3500) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), duration);
+  };
+
   const fetchData = async () => {
     try {
-      const foodRes = await api.get('/owner/food');
-      const roomRes = await api.get('/owner/rooms');
+      const [foodRes, roomRes, employeeRes] = await Promise.all([
+        api.get('/owner/food'),
+        api.get('/owner/rooms'),
+        api.get('/owner/employees'),
+      ]);
+
       if (foodRes.data) setFoods(foodRes.data);
       if (roomRes.data) setRooms(roomRes.data);
+      if (employeeRes.data) setEmployees(employeeRes.data);
       setFallbackData();
     } catch (err) {
+      console.warn('Owner fetch failed, using local fallback data.', err);
       setFallbackData();
     }
   };
 
   const setFallbackData = () => {
-    setEmployees([{ id: "EMP1", name: "Raju", role: "Delivery Boy" }]);
+    setEmployees(emp => emp.length ? emp : [{ id: "EMP1", name: "Raju", role: "Chef", permissions: 'MENU_MANAGER,PRICING_MANAGER' }]);
     setOrders([{ id: "STB1025", status: "PREPARING", assignedTo: null }]);
     if (foods.length === 0) {
       setFoods([
-        { foodName: "Gulab Jamun", price: 150 },
-        { foodName: "Paneer Tikka", price: 300 }
+        { foodName: "Gulab Jamun", price: 150, foodId: 1 },
+        { foodName: "Paneer Tikka", price: 300, foodId: 2 }
       ]);
     }
     if (rooms.length === 0) {
@@ -62,12 +84,91 @@ export default function HotelOwnerDashboard() {
     setOrders(orders.map(o => o.id === orderId ? { ...o, assignedTo: empName } : o));
   };
 
-  const handleAddFood = (e) => {
+  const handleAddFood = async (e) => {
     e.preventDefault();
-    if(newFood.name && newFood.price) {
-      setFoods([...foods, { foodName: newFood.name, price: newFood.price, image: newFood.image }]);
+    if (newFood.name && newFood.price) {
+      const payload = {
+        foodName: newFood.name,
+        category: newFood.category,
+        description: newFood.description,
+        price: Number(newFood.price),
+        imageUrl: newFood.image,
+        offerTag: newFood.offerTag,
+        tags: newFood.tags,
+      };
+      try {
+        const response = await api.post('/owner/food', payload);
+        setFoods([...foods, response.data]);
+        showToast('Menu item added successfully.');
+      } catch (err) {
+        console.error('Error adding food item', err);
+        setFoods([...foods, payload]);
+        showToast('Menu item added locally. Backend unavailable.');
+      }
       setShowFoodModal(false);
-      setNewFood({ name: '', price: '', image: '' });
+      setNewFood({ name: '', price: '', image: '', category: 'Fast Food', description: '', offerTag: '', tags: '' });
+    }
+  };
+
+  const handleAddStaff = async (e) => {
+    e.preventDefault();
+    if (newStaff.name && newStaff.email) {
+      try {
+        const response = await api.post('/owner/employees', {
+          name: newStaff.name,
+          email: newStaff.email,
+          password: 'welcome123',
+        });
+        setEmployees([...employees, response.data]);
+        showToast(`Created ${newStaff.role} staff account.`);
+      } catch (err) {
+        console.error('Error creating staff', err);
+        setEmployees([...employees, { id: `EMP${Date.now()}`, name: newStaff.name, role: newStaff.role }]);
+        showToast('Staff created locally. Backend unavailable.');
+      }
+      setShowAddStaff(false);
+      setNewStaff({ name: '', email: '', role: 'Manager' });
+    }
+  };
+
+  const selectEmployee = (employee) => {
+    setSelectedEmployee(employee);
+    setShowEmployeeSettings(true);
+    const permissions = employee.permissions?.split(',') || [];
+    setEmployeeTasks({
+      menuManager: permissions.includes('MENU_MANAGER'),
+      pricingManager: permissions.includes('PRICING_MANAGER'),
+      orderManager: permissions.includes('ORDER_MANAGER'),
+      housekeeping: permissions.includes('HOUSEKEEPING'),
+      receptionist: permissions.includes('RECEPTIONIST'),
+    });
+  };
+
+  const saveEmployeePermissions = async () => {
+    if (!selectedEmployee) {
+      showToast('Please select an employee first.');
+      return;
+    }
+
+    const permissions = [
+      employeeTasks.menuManager && 'MENU_MANAGER',
+      employeeTasks.pricingManager && 'PRICING_MANAGER',
+      employeeTasks.orderManager && 'ORDER_MANAGER',
+      employeeTasks.housekeeping && 'HOUSEKEEPING',
+      employeeTasks.receptionist && 'RECEPTIONIST',
+    ].filter(Boolean).join(',');
+
+    try {
+      const response = await api.put(`/owner/employees/${selectedEmployee.id}/permissions`, {
+        permissions,
+        assignedTasks: permissions,
+      });
+      setEmployees(employees.map(emp => emp.id === response.data.id ? response.data : emp));
+      showToast('Employee task permissions updated.');
+    } catch (err) {
+      console.error('Error saving employee permissions', err);
+      setEmployees(employees.map(emp => emp.id === selectedEmployee.id ? { ...emp, permissions } : emp));
+      showToast('Employee permissions updated locally. Backend unavailable.');
     }
   };
 
@@ -86,16 +187,6 @@ export default function HotelOwnerDashboard() {
       setOffers([...offers, { title: newOffer.title, description: newOffer.description }]);
       setShowOfferModal(false);
       setNewOffer({ title: '', description: '' });
-    }
-  };
-
-  const handleAddStaff = (e) => {
-    e.preventDefault();
-    if(newStaff.name && newStaff.email) {
-      setEmployees([...employees, { id: "EMP" + Date.now(), name: newStaff.name, role: newStaff.role }]);
-      setShowAddStaff(false);
-      setNewStaff({ name: '', email: '', role: 'Manager' });
-      alert(`Created ${newStaff.role} account for ${newStaff.email}`);
     }
   };
 
@@ -126,7 +217,12 @@ export default function HotelOwnerDashboard() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
+    <div className="max-w-7xl mx-auto px-4 py-12 relative">
+      {toastMessage && (
+        <div className="fixed top-6 right-6 z-50 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-5 py-4 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700">
+          {toastMessage}
+        </div>
+      )}
       <div className="mb-12">
         <h1 className="text-3xl font-bold">Hotel Management Dashboard</h1>
         <p className="text-slate-500">Manage your menu, rooms, offers, and employees.</p>
@@ -220,6 +316,60 @@ export default function HotelOwnerDashboard() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Employee Permissions */}
+        <div className="glass dark:dark-glass p-8 rounded-3xl">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2"><Users className="text-primary-500" /> Employee Access</h2>
+            <button onClick={() => setShowEmployeeSettings(!showEmployeeSettings)} className="px-4 py-2 bg-primary-500 text-white rounded-full text-sm hover:bg-primary-600 transition-colors">
+              {showEmployeeSettings ? 'Hide Settings' : 'Configure Tasks'}
+            </button>
+          </div>
+
+          <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+            {employees.map((emp) => (
+              <button key={emp.id} onClick={() => selectEmployee(emp)} className={`w-full text-left p-4 rounded-2xl border ${selectedEmployee?.id === emp.id ? 'border-primary-500 bg-primary-500/10' : 'border-slate-200 dark:border-slate-700'} hover:border-primary-500 transition-colors`}>
+                <div className="flex justify-between items-center gap-4">
+                  <div>
+                    <p className="font-bold">{emp.name}</p>
+                    <p className="text-sm text-slate-500">{emp.role}</p>
+                  </div>
+                  <div className="text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700">Select</div>
+                </div>
+                {emp.permissions && (
+                  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-white">
+                    {emp.permissions.split(',').map((perm) => perm && (
+                      <span key={perm} className="bg-primary-500 px-2 py-1 rounded-full">{perm.replace('_', ' ')}</span>
+                    ))}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {showEmployeeSettings && selectedEmployee && (
+            <div className="mt-6 border-t border-slate-200 dark:border-slate-700 pt-6 space-y-4">
+              <h3 className="font-bold text-lg">Assign tasks for {selectedEmployee.name}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { key: 'menuManager', label: 'Menu & Upload Management' },
+                  { key: 'pricingManager', label: 'Price Fixing Authority' },
+                  { key: 'orderManager', label: 'Order Coordination' },
+                  { key: 'housekeeping', label: 'Housekeeping Support' },
+                  { key: 'receptionist', label: 'Reception / Check-in' },
+                ].map(option => (
+                  <label key={option.key} className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl cursor-pointer">
+                    <input type="checkbox" checked={employeeTasks[option.key]} onChange={() => setEmployeeTasks(prev => ({ ...prev, [option.key]: !prev[option.key] }))} className="h-4 w-4 accent-primary-500" />
+                    <span className="text-slate-700 dark:text-slate-200">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+              <button onClick={saveEmployeePermissions} className="w-full py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-colors">
+                Save Employee Permissions
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Manage Rooms */}
@@ -368,12 +518,32 @@ export default function HotelOwnerDashboard() {
                   <input type="text" required value={newFood.name} onChange={e=>setNewFood({...newFood, name: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. Rasgulla" />
                 </div>
                 <div>
+                  <label className="block text-sm font-bold mb-2">Category</label>
+                  <select required value={newFood.category} onChange={e=>setNewFood({...newFood, category: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500">
+                    {['Fast Food','Beverages','Veg Food','Non-Veg Food','Chinese','South Indian','Breakfast','Desserts','Healthy','Kids Menu','Combo Meals','Buffet Packages'].map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-bold mb-2">Price (₹)</label>
                   <input type="number" required value={newFood.price} onChange={e=>setNewFood({...newFood, price: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. 100" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold mb-2">Image URL</label>
                   <input type="url" value={newFood.image} onChange={e=>setNewFood({...newFood, image: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://unsplash.com/..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Tags</label>
+                  <input type="text" value={newFood.tags} onChange={e=>setNewFood({...newFood, tags: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. spicy, chef special" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Offer Tag</label>
+                  <input type="text" value={newFood.offerTag} onChange={e=>setNewFood({...newFood, offerTag: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500" placeholder="e.g. Bestseller, Combo Offer" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold mb-2">Description</label>
+                  <textarea value={newFood.description} onChange={e=>setNewFood({...newFood, description: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-primary-500 resize-none h-24" placeholder="A short menu description" />
                 </div>
                 <button type="submit" className="w-full py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-all shadow-lg hover:shadow-primary-500/25">Add Item</button>
               </form>

@@ -30,4 +30,6 @@ public class User {
     private Double walletBalance = 0.0;
     private Integer loyaltyPoints = 0;
     private Boolean isVip = false;
+    private String permissions;
+    private String assignedTasks;
 }

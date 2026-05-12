@@ -3,6 +3,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { backendBaseUrl } from '../utils/api';
 
 export default function Notification() {
   const [notifications, setNotifications] = useState([]);
@@ -12,7 +13,8 @@ export default function Notification() {
     let client = null;
     
     try {
-      const socket = new SockJS('http://localhost:8080/ws');
+      const wsEndpoint = backendBaseUrl ? `${backendBaseUrl}/ws` : '/ws';
+      const socket = new SockJS(wsEndpoint);
       client = new Client({
         webSocketFactory: () => socket,
         onConnect: () => {

@@ -7,70 +7,87 @@ import api from '../utils/api';
 
 const MENU_ITEMS = [
   // 1. Fast Food 🍔
-  { id: 101, name: "Veg Burger", price: 120, category: "Fast Food", type: "Veg", rating: 4.2, image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=60" },
-  { id: 102, name: "Chicken Burger", price: 180, category: "Fast Food", type: "Non-Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60" },
-  { id: 103, name: "Cheese Burger", price: 150, category: "Fast Food", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?auto=format&fit=crop&w=500&q=60" },
-  { id: 104, name: "French Fries", price: 90, category: "Fast Food", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=500&q=60" },
-  { id: 105, name: "Pizza Margherita", price: 250, category: "Fast Food", type: "Veg", rating: 4.7, customizable: true, image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=500&q=60" },
-  { id: 106, name: "Pasta Alfredo", price: 200, category: "Fast Food", type: "Veg", rating: 4.3, image: "https://images.unsplash.com/photo-1621996311239-531f0e5d65bb?auto=format&fit=crop&w=500&q=60" },
-  { id: 107, name: "Grilled Sandwich", price: 110, category: "Fast Food", type: "Veg", rating: 4.1, image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=500&q=60" },
-  { id: 108, name: "Hot Dog", price: 140, category: "Fast Food", type: "Non-Veg", rating: 4.0, image: "https://images.unsplash.com/photo-1541214113241-212e8d2dc60a?auto=format&fit=crop&w=500&q=60" },
-  { id: 109, name: "Garlic Bread", price: 120, category: "Fast Food", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?auto=format&fit=crop&w=500&q=60" },
+  { id: 101, name: "Veg Burger", price: 120, category: "Fast Food", type: "Veg", rating: 4.2, tags: "crispy,burger,cheese", offerTag: "Best Seller", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=60" },
+  { id: 102, name: "Chicken Burger", price: 180, category: "Fast Food", type: "Non-Veg", rating: 4.6, tags: "grilled,juicy", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60" },
+  { id: 103, name: "Cheese Burger", price: 150, category: "Fast Food", type: "Veg", rating: 4.8, customizable: true, tags: "extra cheese,comfort food", image: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?auto=format&fit=crop&w=500&q=60" },
+  { id: 104, name: "French Fries", price: 90, category: "Fast Food", type: "Veg", rating: 4.5, tags: "snack,crispy", image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=500&q=60" },
+  { id: 105, name: "Pizza Margherita", price: 250, category: "Fast Food", type: "Veg", rating: 4.7, customizable: true, tags: "italian,classic", offerTag: "Popular", image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=500&q=60" },
+  { id: 106, name: "Pasta Alfredo", price: 200, category: "Fast Food", type: "Veg", rating: 4.3, tags: "creamy,italian", image: "https://images.unsplash.com/photo-1621996311239-531f0e5d65bb?auto=format&fit=crop&w=500&q=60" },
+  { id: 107, name: "Grilled Sandwich", price: 110, category: "Fast Food", type: "Veg", rating: 4.1, tags: "toasted,snack", image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=500&q=60" },
+  { id: 108, name: "Hot Dog", price: 140, category: "Fast Food", type: "Non-Veg", rating: 4.0, tags: "street food,comfort", image: "https://images.unsplash.com/photo-1541214113241-212e8d2dc60a?auto=format&fit=crop&w=500&q=60" },
+  { id: 109, name: "Garlic Bread", price: 120, category: "Fast Food", type: "Veg", rating: 4.6, tags: "starter,italian", image: "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?auto=format&fit=crop&w=500&q=60" },
 
   // 2. Beverages 🍹
-  { id: 201, name: "Coca Cola", price: 50, category: "Beverages", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&w=500&q=60" },
-  { id: 202, name: "Mango Juice", price: 80, category: "Beverages", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1600271886742-f049cd451b02?auto=format&fit=crop&w=500&q=60" },
-  { id: 203, name: "Chocolate Shake", price: 150, category: "Beverages", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=500&q=60" },
-  { id: 204, name: "Cold Coffee", price: 130, category: "Beverages", type: "Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1461023058943-0708e5223eeb?auto=format&fit=crop&w=500&q=60" },
-  { id: 205, name: "Cappuccino", price: 120, category: "Beverages", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1534260164206-2a3a4a72891d?auto=format&fit=crop&w=500&q=60" },
+  { id: 201, name: "Coca Cola", price: 50, category: "Beverages", type: "Veg", rating: 4.8, tags: "cold,refreshing", image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&w=500&q=60" },
+  { id: 202, name: "Mango Juice", price: 80, category: "Beverages", type: "Veg", rating: 4.5, tags: "fresh,fruit", image: "https://images.unsplash.com/photo-1600271886742-f049cd451b02?auto=format&fit=crop&w=500&q=60" },
+  { id: 203, name: "Chocolate Shake", price: 150, category: "Beverages", type: "Veg", rating: 4.9, tags: "dessert,rich", image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=500&q=60" },
+  { id: 204, name: "Cold Coffee", price: 130, category: "Beverages", type: "Veg", rating: 4.7, tags: "coffee,energizing", image: "https://images.unsplash.com/photo-1461023058943-0708e5223eeb?auto=format&fit=crop&w=500&q=60" },
+  { id: 205, name: "Cappuccino", price: 120, category: "Beverages", type: "Veg", rating: 4.6, tags: "hot,comfort", image: "https://images.unsplash.com/photo-1534260164206-2a3a4a72891d?auto=format&fit=crop&w=500&q=60" },
 
   // 3. Veg Food 🥗
-  { id: 301, name: "Paneer Butter Masala", price: 280, category: "Veg Food", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=60" },
-  { id: 302, name: "Dal Makhani", price: 220, category: "Veg Food", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=60" },
-  { id: 303, name: "Veg Biryani", price: 250, category: "Veg Food", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=500&q=60" },
-  { id: 304, name: "Butter Naan", price: 50, category: "Veg Food", type: "Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1603894584373-5ac82b6ae398?auto=format&fit=crop&w=500&q=60" },
-  { id: 305, name: "Shahi Paneer", price: 290, category: "Veg Food", type: "Veg", rating: 4.8, image: "/food/shahi_paneer.png" },
+  { id: 301, name: "Paneer Butter Masala", price: 280, category: "Veg Food", type: "Veg", rating: 4.9, tags: "creamy,spicy", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=60" },
+  { id: 302, name: "Dal Makhani", price: 220, category: "Veg Food", type: "Veg", rating: 4.8, tags: "comfort,protein", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=60" },
+  { id: 303, name: "Veg Biryani", price: 250, category: "Veg Food", type: "Veg", rating: 4.5, tags: "aromatic,one-pot", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=500&q=60" },
+  { id: 304, name: "Butter Naan", price: 50, category: "Veg Food", type: "Veg", rating: 4.7, tags: "bread,side", image: "https://images.unsplash.com/photo-1603894584373-5ac82b6ae398?auto=format&fit=crop&w=500&q=60" },
+  { id: 305, name: "Shahi Paneer", price: 290, category: "Veg Food", type: "Veg", rating: 4.8, tags: "rich,royal", image: "/food/shahi_paneer.png" },
 
   // 4. Non-Veg Food 🍗
-  { id: 401, name: "Butter Chicken", price: 350, category: "Non-Veg Food", type: "Non-Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=60" },
-  { id: 402, name: "Chicken Biryani", price: 320, category: "Non-Veg Food", type: "Non-Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1589302168068-964664d93cb0?auto=format&fit=crop&w=500&q=60" },
-  { id: 403, name: "Tandoori Chicken", price: 400, category: "Non-Veg Food", type: "Non-Veg", rating: 4.7, image: "/food/tandoori_chicken.png" },
-  { id: 404, name: "Mutton Biryani", price: 450, category: "Non-Veg Food", type: "Non-Veg", rating: 4.9, image: "/food/mutton_biryani.png" },
-  { id: 405, name: "Fish Fry", price: 300, category: "Non-Veg Food", type: "Non-Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=500&q=60" },
+  { id: 401, name: "Butter Chicken", price: 350, category: "Non-Veg Food", type: "Non-Veg", rating: 4.9, tags: "creamy,classic", image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=60" },
+  { id: 402, name: "Chicken Biryani", price: 320, category: "Non-Veg Food", type: "Non-Veg", rating: 4.8, tags: "spicy,aromatic", image: "https://images.unsplash.com/photo-1589302168068-964664d93cb0?auto=format&fit=crop&w=500&q=60" },
+  { id: 403, name: "Tandoori Chicken", price: 400, category: "Non-Veg Food", type: "Non-Veg", rating: 4.7, tags: "grilled,smoky", image: "/food/tandoori_chicken.png" },
+  { id: 404, name: "Mutton Biryani", price: 450, category: "Non-Veg Food", type: "Non-Veg", rating: 4.9, tags: "festive,rich", image: "/food/mutton_biryani.png" },
+  { id: 405, name: "Fish Fry", price: 300, category: "Non-Veg Food", type: "Non-Veg", rating: 4.5, tags: "crispy,seafood", image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=500&q=60" },
 
   // 5. Chinese 🍜
-  { id: 501, name: "Hakka Noodles", price: 180, category: "Chinese", type: "Veg", rating: 4.4, image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=500&q=60" },
-  { id: 502, name: "Chilli Chicken", price: 250, category: "Chinese", type: "Non-Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=500&q=60" },
+  { id: 501, name: "Hakka Noodles", price: 180, category: "Chinese", type: "Veg", rating: 4.4, tags: "noodles,street food", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=500&q=60" },
+  { id: 502, name: "Chilli Chicken", price: 250, category: "Chinese", type: "Non-Veg", rating: 4.7, tags: "szechuan,spicy", offerTag: "Hot Pick", image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=500&q=60" },
+  { id: 503, name: "Spring Rolls", price: 140, category: "Chinese", type: "Veg", rating: 4.3, tags: "starter,crispy", image: "https://images.unsplash.com/photo-1608750216255-392ef611dae3?auto=format&fit=crop&w=500&q=60" },
 
   // 6. South Indian 🥥
-  { id: 601, name: "Masala Dosa", price: 150, category: "South Indian", type: "Veg", rating: 4.8, image: "/food/masala_dosa.png" },
-  { id: 602, name: "Idli Sambhar", price: 120, category: "South Indian", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=500&q=60" },
+  { id: 601, name: "Masala Dosa", price: 150, category: "South Indian", type: "Veg", rating: 4.8, tags: "crispy,spicy", image: "/food/masala_dosa.png" },
+  { id: 602, name: "Idli Sambhar", price: 120, category: "South Indian", type: "Veg", rating: 4.6, tags: "steamed,comfort", image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=500&q=60" },
 
   // 7. Breakfast 🍳
-  { id: 701, name: "Pancakes", price: 160, category: "Breakfast", type: "Veg", rating: 4.5, image: "https://images.unsplash.com/photo-1528207776546-38f36c533e4b?auto=format&fit=crop&w=500&q=60" },
-  { id: 702, name: "Bread Omelette", price: 90, category: "Breakfast", type: "Non-Veg", rating: 4.3, image: "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=500&q=60" },
+  { id: 701, name: "Pancakes", price: 160, category: "Breakfast", type: "Veg", rating: 4.5, tags: "sweet,morning", image: "https://images.unsplash.com/photo-1528207776546-38f36c533e4b?auto=format&fit=crop&w=500&q=60" },
+  { id: 702, name: "Bread Omelette", price: 90, category: "Breakfast", type: "Non-Veg", rating: 4.3, tags: "quick,budget", image: "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=500&q=60" },
+  { id: 703, name: "Avocado Toast", price: 210, category: "Breakfast", type: "Veg", rating: 4.6, tags: "healthy,continental", image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=500&q=60" },
 
   // 8. Desserts 🍰
-  { id: 801, name: "Gulab Jamun", price: 100, category: "Desserts", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1596450514735-a50d2402129c?auto=format&fit=crop&w=500&q=60" },
-  { id: 802, name: "Chocolate Brownie", price: 180, category: "Desserts", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=500&q=60" },
+  { id: 801, name: "Gulab Jamun", price: 100, category: "Desserts", type: "Veg", rating: 4.9, tags: "sweet,classic", image: "https://images.unsplash.com/photo-1596450514735-a50d2402129c?auto=format&fit=crop&w=500&q=60" },
+  { id: 802, name: "Chocolate Brownie", price: 180, category: "Desserts", type: "Veg", rating: 4.8, tags: "rich,chocolate", image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=500&q=60" },
+  { id: 803, name: "Rasgulla", price: 110, category: "Desserts", type: "Veg", rating: 4.9, tags: "light,spongy", image: "https://images.unsplash.com/photo-1584270354949-1a430d14ebd2?auto=format&fit=crop&w=500&q=60" },
 
   // 9. Healthy / Diet Food 🥙
-  { id: 901, name: "Grilled Chicken Salad", price: 250, category: "Healthy", type: "Non-Veg", rating: 4.7, image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=60" },
-  { id: 902, name: "Protein Shake", price: 200, category: "Healthy", type: "Veg", rating: 4.6, image: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=500&q=60" },
+  { id: 901, name: "Grilled Chicken Salad", price: 250, category: "Healthy", type: "Non-Veg", rating: 4.7, tags: "protein,low-calorie", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=60" },
+  { id: 902, name: "Protein Shake", price: 200, category: "Healthy", type: "Veg", rating: 4.6, tags: "energizing,shake", image: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=500&q=60" },
+  { id: 903, name: "Quinoa Bowl", price: 240, category: "Healthy", type: "Veg", rating: 4.5, tags: "superfood,gluten-free", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=60" },
 
   // 10. Kids Menu 👦
-  { id: 1001, name: "Mini Burger & Smile Fries", price: 200, category: "Kids Menu", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1632712995328-912b7f3549ce?auto=format&fit=crop&w=500&q=60" },
-  
+  { id: 1001, name: "Mini Burger & Smile Fries", price: 200, category: "Kids Menu", type: "Veg", rating: 4.9, tags: "fun,combo", image: "https://images.unsplash.com/photo-1632712995328-912b7f3549ce?auto=format&fit=crop&w=500&q=60" },
+  { id: 1002, name: "Chocolate Milkshake", price: 120, category: "Kids Menu", type: "Veg", rating: 4.8, tags: "dessert,drink", image: "https://images.unsplash.com/photo-1524348729527-6f33b3f37a0b?auto=format&fit=crop&w=500&q=60" },
+
   // 11. Combo Meals 🍽️
-  { id: 1101, name: "Burger + Fries + Coke", price: 250, category: "Combo Meals", type: "Veg", rating: 4.8, image: "https://images.unsplash.com/photo-1594212884260-0a37de5cc235?auto=format&fit=crop&w=500&q=60" },
-  { id: 1102, name: "Chicken Biryani + Coke", price: 350, category: "Combo Meals", type: "Non-Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1589302168068-964664d93cb0?auto=format&fit=crop&w=500&q=60" },
+  { id: 1101, name: "Burger + Fries + Coke", price: 250, category: "Combo Meals", type: "Veg", rating: 4.8, tags: "value meal", offerTag: "Combo Offer", image: "https://images.unsplash.com/photo-1594212884260-0a37de5cc235?auto=format&fit=crop&w=500&q=60" },
+  { id: 1102, name: "Chicken Biryani + Coke", price: 350, category: "Combo Meals", type: "Non-Veg", rating: 4.9, tags: "full meal", offerTag: "Family Pack", image: "https://images.unsplash.com/photo-1589302168068-964664d93cb0?auto=format&fit=crop&w=500&q=60" },
+  { id: 1103, name: "Paneer Wrap + Salad", price: 299, category: "Combo Meals", type: "Veg", rating: 4.6, tags: "light lunch", image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=500&q=60" },
 
   // 12. Buffet Packages
-  { id: 1201, name: "Grand Veg Buffet", price: 799, category: "Buffet Packages", type: "Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=60" },
-  { id: 1202, name: "Royal Non-Veg Buffet", price: 999, category: "Buffet Packages", type: "Non-Veg", rating: 4.9, image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=60" },
+  { id: 1201, name: "Grand Veg Buffet", price: 799, category: "Buffet Packages", type: "Veg", rating: 4.9, tags: "all-you-can-eat", offerTag: "Weekend Special", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=60" },
+  { id: 1202, name: "Royal Non-Veg Buffet", price: 999, category: "Buffet Packages", type: "Non-Veg", rating: 4.9, tags: "banquet,celebration", offerTag: "Premium Buffet", image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=60" },
 ];
 
 const CATEGORIES = ["All", "Fast Food", "Beverages", "Veg Food", "Non-Veg Food", "Chinese", "South Indian", "Breakfast", "Desserts", "Healthy", "Kids Menu", "Combo Meals", "Buffet Packages"];
+
+const TOP_OFFERS = [
+  { id: 1, title: 'Happy Hour', description: '20% off on all beverages between 5pm and 7pm.' },
+  { id: 2, title: 'Family Feast', description: 'Order buffet and get free dessert.' },
+  { id: 3, title: 'Weekend Combo', description: 'Save ₹50 on burger + fries + drink.' },
+];
+
+const SUBSCRIPTIONS = [
+  { id: 1, name: 'Meal Plan Plus', price: 999, benefits: 'Daily breakfast + lunch for 7 days' },
+  { id: 2, name: 'Room Service Premium', price: 1499, benefits: 'Unlimited snacks and beverages for 5 days' },
+];
 
 export default function OrderPage() {
   const [cart, setCart] = useState([]);
@@ -80,7 +97,7 @@ export default function OrderPage() {
   const [tokenInfo, setTokenInfo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
-  const [activeFilter, setActiveFilter] = useState('All'); // All, Veg, Non-Veg, Premium, Spicy
+  const [activeFilter, setActiveFilter] = useState('All'); // All, Veg, Non-Veg, Premium, Spicy, Recommended
   
   // Customization Modal State
   const [customItem, setCustomItem] = useState(null);
@@ -96,12 +113,15 @@ export default function OrderPage() {
 
   const filteredMenu = useMemo(() => {
     return MENU_ITEMS.filter(item => {
-      const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const searchable = [item.name, item.category, item.tags, item.offerTag].filter(Boolean).join(' ').toLowerCase();
+      const matchSearch = searchable.includes(searchQuery.toLowerCase());
       const matchCat = activeCategory === 'All' || item.category === activeCategory;
       const matchFilter = activeFilter === 'All' || 
                           (activeFilter === 'Veg' && item.type === 'Veg') || 
                           (activeFilter === 'Non-Veg' && item.type === 'Non-Veg') ||
-                          (activeFilter === 'Premium' && item.price >= 300);
+                          (activeFilter === 'Premium' && item.price >= 300) ||
+                          (activeFilter === 'Spicy' && item.tags?.includes('spicy')) ||
+                          (activeFilter === 'Recommended' && item.offerTag === 'Popular');
       return matchSearch && matchCat && matchFilter;
     });
   }, [searchQuery, activeCategory, activeFilter]);
@@ -210,9 +230,16 @@ export default function OrderPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-orange-500">
             The Ultimate Dining
           </h1>
-          <p className="text-slate-500 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-yellow-500" /> AI suggests: <span className="font-bold text-white">Pizza + Cold Coffee Combo</span>
+          <p className="text-slate-500 flex flex-wrap items-center gap-2">
+            <Sparkles className="w-5 h-5 text-yellow-500" /> AI suggests: <span className="font-bold text-white">Pizza + Cold Coffee Combo</span> for your next room order.
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {TOP_OFFERS.map(offer => (
+              <div key={offer.id} className="rounded-3xl border border-primary-500/20 bg-primary-500/5 px-4 py-3 text-sm text-white/90">
+                <span className="font-bold">{offer.title}:</span> {offer.description}
+              </div>
+            ))}
+          </div>
         </div>
         
         <div className="glass dark:dark-glass px-6 py-3 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-colors" onClick={() => setIsCartOpen(true)}>
@@ -235,7 +262,7 @@ export default function OrderPage() {
         </div>
         
         <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-          {['All', 'Veg', 'Non-Veg', 'Premium'].map(filter => (
+          {['All', 'Veg', 'Non-Veg', 'Premium', 'Spicy', 'Recommended'].map(filter => (
             <button 
               key={filter} onClick={() => setActiveFilter(filter)}
               className={`px-6 py-4 rounded-2xl font-bold whitespace-nowrap transition-all flex items-center gap-2 ${activeFilter === filter ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30' : 'glass dark:dark-glass hover:bg-white/10'}`}
@@ -298,7 +325,15 @@ export default function OrderPage() {
                       <Star className="w-4 h-4 fill-yellow-500" /> {item.rating}
                     </div>
                   </div>
-                  <p className="text-sm text-slate-500 mb-4">{item.category}</p>
+                  <p className="text-sm text-slate-500 mb-2">{item.category}</p>
+                  {item.tags && (
+                    <p className="text-xs text-slate-400 mb-2">{item.tags.split(',').map(tag => tag.trim()).join(' • ')}</p>
+                  )}
+                  {item.offerTag && (
+                    <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-white bg-primary-500 px-3 py-1 rounded-full mb-3">
+                      {item.offerTag}
+                    </span>
+                  )}
                 </div>
                 
                 <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -322,6 +357,19 @@ export default function OrderPage() {
             <p>Try adjusting your search or filters.</p>
           </div>
         )}
+      </div>
+
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {SUBSCRIPTIONS.map(plan => (
+          <div key={plan.id} className="glass dark:dark-glass p-6 rounded-3xl border border-white/10">
+            <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+            <p className="text-slate-400 mb-4">{plan.benefits}</p>
+            <div className="flex items-end justify-between gap-4">
+              <span className="text-3xl font-black text-primary-500">₹{plan.price}</span>
+              <button className="px-5 py-3 bg-primary-500 text-white rounded-2xl font-bold hover:bg-primary-600 transition-colors">Subscribe</button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Customization Modal */}

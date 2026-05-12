@@ -1,6 +1,7 @@
 package com.example.staybite_backend.controller;
 
 import com.example.staybite_backend.entity.Order;
+import com.example.staybite_backend.exception.ResourceNotFoundException;
 import com.example.staybite_backend.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/status")
     public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
         order.setOrderStatus(status);
         return ResponseEntity.ok(orderRepository.save(order));
     }
