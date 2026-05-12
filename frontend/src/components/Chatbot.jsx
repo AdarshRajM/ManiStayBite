@@ -30,21 +30,34 @@ export default function Chatbot() {
 
     // Simulate AI Processing (LLM Vision mock)
     setTimeout(() => {
-      let botReply = "I can help you with that! How else can I assist you today?";
+      let botReply = "I am your ManiStayBite Smart Receptionist! I can help you book rooms, suggest food, handle complaints, and recommend nearby places. How can I assist you?";
       
+      const lowerText = text.toLowerCase();
+
       if (image) {
         botReply = "I analyzed your image! It looks like a 'Gulab Jamun'. We do have it available! It costs ₹150 per plate. Preparation time is approx 10 minutes. Would you like me to add it to your order?";
-      } else if (text.toLowerCase().includes("sweet") || text.toLowerCase().includes("dessert")) {
+      } else if (lowerText.includes("room") && lowerText.includes("under") && lowerText.includes("family")) {
+        // Handle: "Book best room for family under ₹4000"
+        const priceMatch = lowerText.match(/\d+/);
+        const price = priceMatch ? parseInt(priceMatch[0]) : 4000;
+        botReply = `Based on your request, I suggest our "Family Suite" which is perfectly priced under ₹${price}. It includes complimentary breakfast and extra bedding. Would you like me to proceed with the booking?`;
+      } else if (lowerText.includes("room")) {
+        botReply = "We have Deluxe (₹2500/night) and Premium Family Rooms (₹3800/night) available. Let me know your budget and I can find the best fit for you!";
+      } else if (lowerText.includes("food") || lowerText.includes("suggest") && (lowerText.includes("eat") || lowerText.includes("menu"))) {
+        botReply = "Our chef highly recommends the 'Special Thali' and 'Paneer Butter Masala'. For quick bites, our 'Loaded Nachos' and 'Cold Coffee' are very popular! You can order directly from the Food Menu.";
+      } else if (lowerText.includes("complaint") || lowerText.includes("issue") || lowerText.includes("not working") || lowerText.includes("clean")) {
+        botReply = "I apologize for the inconvenience. I have logged your complaint and our housekeeping/maintenance staff has been notified immediately. They will be at your room within 5 minutes. Please let me know if you need anything else.";
+      } else if (lowerText.includes("nearby") || lowerText.includes("places") || lowerText.includes("visit") || lowerText.includes("tourist")) {
+        botReply = "There are several amazing places to visit nearby! 1. City Museum (2km away), 2. Lake View Park (5km away) - perfect for evenings, and 3. Historic Fort (10km away). Would you like me to arrange a cab for you?";
+      } else if (lowerText.includes("sweet") || lowerText.includes("dessert")) {
         botReply = "We have amazing sweets! Rasmalai (₹200), Gulab Jamun (₹150), and Jalebi (₹100). They are all currently available. You can order them from the Food Menu page.";
-      } else if (text.toLowerCase().includes("room")) {
-        botReply = "We have Deluxe and Single AC rooms available right now starting at ₹2500/night. Please visit the Rooms page to book.";
-      } else if (text.toLowerCase().includes("order")) {
+      } else if (lowerText.includes("order")) {
         botReply = "You can order directly by going to the 'Order Food' page from the top menu. Let me know if you want recommendations!";
       }
 
       setMessages(prev => [...prev, { id: Date.now() + 1, text: botReply, isBot: true }]);
       setIsTyping(false);
-    }, 2000);
+    }, 1500);
   };
 
   const handleImageUpload = (e) => {
